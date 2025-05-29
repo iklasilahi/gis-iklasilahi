@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sistem Peta Museum Indonesia</title>
+  <style>
+    /* Reset */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: #f1f1f1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px 15px;
+      line-height: 1.5;
+    }
+    header {
+      margin-bottom: 40px;
+      text-align: center;
+      user-select: none;
+      text-shadow: 0 2px 5px rgba(0,0,0,0.7);
+    }
+    header h1 {
+      font-size: 3rem;
+      font-weight: 800;
+      letter-spacing: 3px;
+      color: #ffcc33;
+    }
+    nav {
+      display: flex;
+      gap: 36px;
+      margin-bottom: 50px;
+      font-weight: 600;
+      font-size: 1.15rem;
+      text-transform: uppercase;
+    }
+    nav a {
+      color: #ffd966;
+      text-decoration: none;
+      padding: 8px 20px;
+      border-radius: 50px;
+      transition: background-color 0.25s ease, color 0.25s ease;
+      box-shadow: 0 0 8px rgba(255, 217, 102, 0.6);
+    }
+    nav a:hover,
+    nav a.active {
+      background-color: #ffd966;
+      color: #1e3c72;
+      box-shadow: 0 0 20px rgba(255, 217, 102, 1);
+    }
+    main {
+      width: 100%;
+      max-width: 840px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      padding: 40px 50px;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      text-align: center;
+    }
+    main h2 {
+      font-size: 2.4rem;
+      margin-bottom: 18px;
+      color: #ffd966;
+      font-weight: 700;
+      text-shadow: 0 1px 5px rgba(0,0,0,0.7);
+    }
+    main p {
+      font-size: 1.25rem;
+      margin-bottom: 36px;
+      color: #f4f4f4dd;
+      max-width: 720px;
+      margin-left: auto;
+      margin-right: auto;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+    }
+    button#showMapBtn {
+      background: linear-gradient(90deg, #ffcc33, #ffb700);
+      border: none;
+      color: #1e3c72;
+      font-weight: 700;
+      font-size: 1.2rem;
+      padding: 16px 50px;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(255, 204, 51, 0.8);
+      transition: all 0.3s ease;
+      user-select: none;
+    }
+    button#showMapBtn:hover {
+      background: linear-gradient(270deg, #ffb700, #ffcc33);
+      box-shadow: 0 8px 30px rgba(255, 204, 51, 1);
+      transform: scale(1.08);
+    }
+    #peta-container {
+      margin-top: 48px;
+      border-radius: 24px;
+      box-shadow: 0 12px 36px rgba(0,0,0,0.7);
+      overflow: hidden;
+      display: none;
+      transition: opacity 0.4s ease;
+    }
+    #peta-container iframe {
+      width: 100%;
+      height: 520px;
+      border: none;
+      display: block;
+    }
+    section.about {
+      margin-top: 60px;
+      max-width: 840px;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 24px;
+      padding: 30px 40px;
+      display: flex;
+      align-items: center;
+      gap: 40px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+      color: #ffe486;
+      user-select: none;
+    }
+    section.about img {
+      width: 180px;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 5px solid #ffd966;
+      box-shadow: 0 6px 24px rgba(255, 217, 102, 0.8);
+      flex-shrink: 0;
+    }
+    section.about .info {
+      flex: 1;
+      font-size: 1.15rem;
+      line-height: 1.6;
+    }
+    section.about .info h3 {
+      margin-bottom: 16px;
+      font-weight: 700;
+      font-size: 1.9rem;
+      color: #ffd966;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.7);
+    }
+    section.about .info p {
+      margin-bottom: 12px;
+      color: #fff8b5cc;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    }
+    section.about .info p strong {
+      color: #fff3a4;
+    }
+    section.about .info a {
+      color: #ffeb7a;
+      font-weight: 600;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+    section.about .info a:hover {
+      color: #ffffc8;
+      text-decoration: underline;
+    }
+    footer {
+      margin-top: 70px;
+      font-weight: 600;
+      font-size: 1rem;
+      color: #fff3b0aa;
+      text-align: center;
+      user-select: none;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+    }
+    /* Responsive */
+    @media (max-width: 768px) {
+      main {
+        padding: 30px 25px;
+      }
+      section.about {
+        flex-direction: column;
+        text-align: center;
+        padding: 25px 20px;
+      }
+      section.about img {
+        width: 140px;
+        height: 140px;
+        margin-bottom: 20px;
+      }
+      section.about .info h3 {
+        font-size: 1.6rem;
+      }
+      section.about .info p {
+        font-size: 1rem;
+      }
+      nav {
+        gap: 24px;
+        font-size: 1rem;
+      }
+      header h1 {
+        font-size: 2.4rem;
+      }
+      button#showMapBtn {
+        padding: 14px 40px;
+        font-size: 1.1rem;
+      }
+      #peta-container iframe {
+        height: 380px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Sistem Peta Museum Indonesia</h1>
+  </header>
+
+  <nav role="navigation" aria-label="Menu utama">
+    <a href="#" class="active" aria-current="page">Home</a>
+    <a href="#">Kontak</a>
+    <a href="#">Tentang</a>
+  </nav>
+
+  <main role="main" aria-labelledby="welcomeTitle">
+    <h2 id="welcomeTitle">Selamat Datang</h2>
+    <p>
+      Temukan lokasi dan informasi menarik tentang museum-museum di seluruh Indonesia melalui peta interaktif kami.
+    </p>
+    <button id="showMapBtn" type="button" aria-label="Tampilkan peta museum">Lihat Peta</button>
+
+    <div id="peta-container" aria-live="polite" aria-atomic="true">
+      <iframe src="peta.html" title="Peta Museum Indonesia"></iframe>
+    </div>
+  </main>
+
+  <section class="about" aria-labelledby="aboutTitle">
+    <img src="foto.jpeg" alt="Foto Iklas Ilahi" />
+    <div class="info">
+      <h3 id="aboutTitle">Tentang Pembuat</h3>
+      <p><strong>Nama:</strong> Iklas Ilahi</p>
+      <p><strong>Email:</strong> iklasilahi31@gmail.com</p>
+      <p><strong>Telepon:</strong> 082371929480</p>
+      <p><strong>Alamat:</strong> Kubang Putiah, Bukittinggi, Sumatera Barat</p>
+      <p><strong>GitHub:</strong> <a href="https://github.com/iklasilahi" target="_blank" rel="noopener noreferrer">github.com/iklasilahi</a></p>
+    </div>
+  </section>
+
+  <footer role="contentinfo">
+    &copy; 2025 Sistem Peta Museum | Iklas Ilahi (2522078) - PTIK 6C
+  </footer>
+
+  <script>
+    const btn = document.getElementById('showMapBtn');
+    const mapContainer = document.getElementById('peta-container');
+
+    btn.addEventListener('click', () => {
+      if (mapContainer.style.display === 'block') {
+        mapContainer.style.opacity = '0';
+        setTimeout(() => {
+          mapContainer.style.display = 'none';
+        }, 300);
+        btn.textContent = 'Lihat Peta';
+      } else {
+        mapContainer.style.display = 'block';
+        setTimeout(() => {
+          mapContainer.style.opacity = '1';
+        }, 10);
+        btn.textContent = 'Tutup Peta';
+      }
+    });
+  </script>
+</body>
+</html>

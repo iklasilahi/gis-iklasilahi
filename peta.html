@@ -1,0 +1,1509 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css">
+        <link rel="stylesheet" href="css/L.Control.Layers.Tree.css">
+        <link rel="stylesheet" href="css/L.Control.Locate.min.css">
+        <link rel="stylesheet" href="css/qgis2web.css">
+        <link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <link rel="stylesheet" href="css/leaflet-control-geocoder.Geocoder.css">
+        <link rel="stylesheet" href="css/leaflet-measure.css">
+        <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        </style>
+        <title></title>
+    </head>
+    <body>
+        <div id="map">
+        </div>
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script>
+        <script src="js/L.Control.Layers.Tree.min.js"></script>
+        <script src="js/L.Control.Locate.min.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="js/leaflet-control-geocoder.Geocoder.js"></script>
+        <script src="js/leaflet-measure.js"></script>
+        <script src="data/INDONESIA_KAB_1.js"></script>
+        <script src="data/FILTER_INDONESIA_2.js"></script>
+        <script src="data/DISSOLVE_INDONESIA_3.js"></script>
+        <script src="data/JOIN_DATA_INDONESIA_MUSEUM_4.js"></script>
+        <script src="data/IMPORTPOTO_5.js"></script>
+        <script src="data/DIAGRAM_MUSEUM_INDONESIA_6.js"></script>
+        <script src="data/TITIK_KOOORDINAT_7.js"></script>
+        <script src="data/LIGHTNESS_MUSEUM_8.js"></script>
+        <script src="data/centroid_9.js"></script>
+        <script src="data/fotokordinat_10.js"></script>
+        <script>
+        var map = L.map('map', {
+            zoomControl:false, maxZoom:28, minZoom:1
+        }).fitBounds([[-7.538017977364321,107.9591811288777],[-6.648001972336015,109.50771512708161]]);
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+        // remove popup's row if "visible-with-data"
+        function removeEmptyRowsFromPopupContent(content, feature) {
+         var tempDiv = document.createElement('div');
+         tempDiv.innerHTML = content;
+         var rows = tempDiv.querySelectorAll('tr');
+         for (var i = 0; i < rows.length; i++) {
+             var td = rows[i].querySelector('td.visible-with-data');
+             var key = td ? td.id : '';
+             if (td && td.classList.contains('visible-with-data') && feature.properties[key] == null) {
+                 rows[i].parentNode.removeChild(rows[i]);
+             }
+         }
+         return tempDiv.innerHTML;
+        }
+        // add class to format popup if it contains media
+		function addClassToPopupIfMedia(content, popup) {
+			var tempDiv = document.createElement('div');
+			tempDiv.innerHTML = content;
+			if (tempDiv.querySelector('td img')) {
+				popup._contentNode.classList.add('media');
+					// Delay to force the redraw
+					setTimeout(function() {
+						popup.update();
+					}, 10);
+			} else {
+				popup._contentNode.classList.remove('media');
+			}
+		}
+        var zoomControl = L.control.zoom({
+            position: 'topleft'
+        }).addTo(map);
+        L.control.locate({locateOptions: {maxZoom: 19}}).addTo(map);
+        var measureControl = new L.Control.Measure({
+            position: 'topleft',
+            primaryLengthUnit: 'meters',
+            secondaryLengthUnit: 'kilometers',
+            primaryAreaUnit: 'sqmeters',
+            secondaryAreaUnit: 'hectares'
+        });
+        measureControl.addTo(map);
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0].innerHTML = '';
+        document.getElementsByClassName('leaflet-control-measure-toggle')[0].className += ' fas fa-ruler';
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+        }
+        map.createPane('pane_OSMStandard_0');
+        map.getPane('pane_OSMStandard_0').style.zIndex = 400;
+        var layer_OSMStandard_0 = L.tileLayer('http://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            pane: 'pane_OSMStandard_0',
+            opacity: 1.0,
+            attribution: '<a href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors, CC-BY-SA</a>',
+            minZoom: 1,
+            maxZoom: 28,
+            minNativeZoom: 0,
+            maxNativeZoom: 19
+        });
+        layer_OSMStandard_0;
+        map.addLayer(layer_OSMStandard_0);
+        function pop_INDONESIA_KAB_1(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ID'] !== null ? autolinker.link(String(feature.properties['ID']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td class="visible-with-data" id="Kabupaten_" colspan="2"><strong>Kabupaten_</strong><br />' + (feature.properties['Kabupaten_'] !== null ? autolinker.link(String(feature.properties['Kabupaten_']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['kode'] !== null ? autolinker.link(String(feature.properties['kode']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Ibukota'] !== null ? autolinker.link(String(feature.properties['Ibukota']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Dsr_Hukum'] !== null ? autolinker.link(String(feature.properties['Dsr_Hukum']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Provinsi'] !== null ? autolinker.link(String(feature.properties['Provinsi']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Bupati_Wal'] !== null ? autolinker.link(String(feature.properties['Bupati_Wal']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Wakil'] !== null ? autolinker.link(String(feature.properties['Wakil']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Batas_Utar'] !== null ? autolinker.link(String(feature.properties['Batas_Utar']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Batas_Sela'] !== null ? autolinker.link(String(feature.properties['Batas_Sela']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Batas_Bara'] !== null ? autolinker.link(String(feature.properties['Batas_Bara']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Batas_Timu'] !== null ? autolinker.link(String(feature.properties['Batas_Timu']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Lmb_Geo'] !== null ? autolinker.link(String(feature.properties['Lmb_Geo']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_INDONESIA_KAB_1_0() {
+            return {
+                pane: 'pane_INDONESIA_KAB_1',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(152,125,183,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_INDONESIA_KAB_1');
+        map.getPane('pane_INDONESIA_KAB_1').style.zIndex = 401;
+        map.getPane('pane_INDONESIA_KAB_1').style['mix-blend-mode'] = 'normal';
+        var layer_INDONESIA_KAB_1 = new L.geoJson(json_INDONESIA_KAB_1, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_INDONESIA_KAB_1',
+            layerName: 'layer_INDONESIA_KAB_1',
+            pane: 'pane_INDONESIA_KAB_1',
+            onEachFeature: pop_INDONESIA_KAB_1,
+            style: style_INDONESIA_KAB_1_0,
+        });
+        bounds_group.addLayer(layer_INDONESIA_KAB_1);
+        map.addLayer(layer_INDONESIA_KAB_1);
+        function pop_FILTER_INDONESIA_2(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['fid'] !== null ? autolinker.link(String(feature.properties['fid']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ID'] !== null ? autolinker.link(String(feature.properties['ID']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td class="visible-with-data" id="Kabupaten_" colspan="2"><strong>Kabupaten_</strong><br />' + (feature.properties['Kabupaten_'] !== null ? autolinker.link(String(feature.properties['Kabupaten_']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['kode'] !== null ? autolinker.link(String(feature.properties['kode']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Ibukota'] !== null ? autolinker.link(String(feature.properties['Ibukota']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Dsr_Hukum'] !== null ? autolinker.link(String(feature.properties['Dsr_Hukum']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Provinsi'] !== null ? autolinker.link(String(feature.properties['Provinsi']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Bupati_Wal'] !== null ? autolinker.link(String(feature.properties['Bupati_Wal']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Wakil'] !== null ? autolinker.link(String(feature.properties['Wakil']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Batas_Utar'] !== null ? autolinker.link(String(feature.properties['Batas_Utar']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Batas_Sela'] !== null ? autolinker.link(String(feature.properties['Batas_Sela']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Batas_Bara'] !== null ? autolinker.link(String(feature.properties['Batas_Bara']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Batas_Timu'] !== null ? autolinker.link(String(feature.properties['Batas_Timu']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Lmb_Geo'] !== null ? autolinker.link(String(feature.properties['Lmb_Geo']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_FILTER_INDONESIA_2_0() {
+            return {
+                pane: 'pane_FILTER_INDONESIA_2',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(232,113,141,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_FILTER_INDONESIA_2');
+        map.getPane('pane_FILTER_INDONESIA_2').style.zIndex = 402;
+        map.getPane('pane_FILTER_INDONESIA_2').style['mix-blend-mode'] = 'normal';
+        var layer_FILTER_INDONESIA_2 = new L.geoJson(json_FILTER_INDONESIA_2, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_FILTER_INDONESIA_2',
+            layerName: 'layer_FILTER_INDONESIA_2',
+            pane: 'pane_FILTER_INDONESIA_2',
+            onEachFeature: pop_FILTER_INDONESIA_2,
+            style: style_FILTER_INDONESIA_2_0,
+        });
+        bounds_group.addLayer(layer_FILTER_INDONESIA_2);
+        map.addLayer(layer_FILTER_INDONESIA_2);
+        function pop_DISSOLVE_INDONESIA_3(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['fid'] !== null ? autolinker.link(String(feature.properties['fid']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ID'] !== null ? autolinker.link(String(feature.properties['ID']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td class="visible-with-data" id="Kabupaten_" colspan="2"><strong>Kabupaten_</strong><br />' + (feature.properties['Kabupaten_'] !== null ? autolinker.link(String(feature.properties['Kabupaten_']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['kode'] !== null ? autolinker.link(String(feature.properties['kode']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Ibukota'] !== null ? autolinker.link(String(feature.properties['Ibukota']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Dsr_Hukum'] !== null ? autolinker.link(String(feature.properties['Dsr_Hukum']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Provinsi'] !== null ? autolinker.link(String(feature.properties['Provinsi']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Bupati_Wal'] !== null ? autolinker.link(String(feature.properties['Bupati_Wal']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Wakil'] !== null ? autolinker.link(String(feature.properties['Wakil']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Batas_Utar'] !== null ? autolinker.link(String(feature.properties['Batas_Utar']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Batas_Sela'] !== null ? autolinker.link(String(feature.properties['Batas_Sela']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Batas_Bara'] !== null ? autolinker.link(String(feature.properties['Batas_Bara']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Batas_Timu'] !== null ? autolinker.link(String(feature.properties['Batas_Timu']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Lmb_Geo'] !== null ? autolinker.link(String(feature.properties['Lmb_Geo']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_DISSOLVE_INDONESIA_3_0() {
+            return {
+                pane: 'pane_DISSOLVE_INDONESIA_3',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(133,182,111,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_DISSOLVE_INDONESIA_3');
+        map.getPane('pane_DISSOLVE_INDONESIA_3').style.zIndex = 403;
+        map.getPane('pane_DISSOLVE_INDONESIA_3').style['mix-blend-mode'] = 'normal';
+        var layer_DISSOLVE_INDONESIA_3 = new L.geoJson(json_DISSOLVE_INDONESIA_3, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_DISSOLVE_INDONESIA_3',
+            layerName: 'layer_DISSOLVE_INDONESIA_3',
+            pane: 'pane_DISSOLVE_INDONESIA_3',
+            onEachFeature: pop_DISSOLVE_INDONESIA_3,
+            style: style_DISSOLVE_INDONESIA_3_0,
+        });
+        bounds_group.addLayer(layer_DISSOLVE_INDONESIA_3);
+        map.addLayer(layer_DISSOLVE_INDONESIA_3);
+        function pop_JOIN_DATA_INDONESIA_MUSEUM_4(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['fid'] !== null ? autolinker.link(String(feature.properties['fid']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_ID'] !== null ? autolinker.link(String(feature.properties['Museum_ID']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_kode'] !== null ? autolinker.link(String(feature.properties['Museum_kode']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td class="visible-with-data" id="Museum_NAMA ITEM DATA" colspan="2"><strong>Museum_NAMA ITEM DATA</strong><br />' + (feature.properties['Museum_NAMA ITEM DATA'] !== null ? autolinker.link(String(feature.properties['Museum_NAMA ITEM DATA']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_Provinsi'] !== null ? autolinker.link(String(feature.properties['Museum_Provinsi']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_Kabupaten'] !== null ? autolinker.link(String(feature.properties['Museum_Kabupaten']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_Alamat'] !== null ? autolinker.link(String(feature.properties['Museum_Alamat']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_LATITUDE'] !== null ? autolinker.link(String(feature.properties['Museum_LATITUDE']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_LONGITUDE'] !== null ? autolinker.link(String(feature.properties['Museum_LONGITUDE']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_Jenis Museum'] !== null ? autolinker.link(String(feature.properties['Museum_Jenis Museum']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_Tipe Museum'] !== null ? autolinker.link(String(feature.properties['Museum_Tipe Museum']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_Pengelola'] !== null ? autolinker.link(String(feature.properties['Museum_Pengelola']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td class="visible-with-data" id="Museum_Foto" colspan="2"><strong>Museum_Foto</strong><br />' + (feature.properties['Museum_Foto'] !== null ? autolinker.link(String(feature.properties['Museum_Foto']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_Pengunjung'] !== null ? autolinker.link(String(feature.properties['Museum_Pengunjung']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_Karyawan'] !== null ? autolinker.link(String(feature.properties['Museum_Karyawan']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_JOIN_DATA_INDONESIA_MUSEUM_4_0(feature) {
+            switch(String(feature.properties['Museum_Provinsi'])) {
+                default:
+                    return {
+                pane: 'pane_JOIN_DATA_INDONESIA_MUSEUM_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(55,182,202,1.0)',
+                interactive: true,
+            }
+                    break;
+                case ' Jakarta':
+                    return {
+                pane: 'pane_JOIN_DATA_INDONESIA_MUSEUM_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(226,228,90,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Aceh':
+                    return {
+                pane: 'pane_JOIN_DATA_INDONESIA_MUSEUM_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(16,47,202,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Banten':
+                    return {
+                pane: 'pane_JOIN_DATA_INDONESIA_MUSEUM_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(78,212,183,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'D.I Yogyakarta':
+                    return {
+                pane: 'pane_JOIN_DATA_INDONESIA_MUSEUM_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(220,178,95,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'jakarta':
+                    return {
+                pane: 'pane_JOIN_DATA_INDONESIA_MUSEUM_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(185,122,240,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Jakarta':
+                    return {
+                pane: 'pane_JOIN_DATA_INDONESIA_MUSEUM_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(52,201,117,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Jambi':
+                    return {
+                pane: 'pane_JOIN_DATA_INDONESIA_MUSEUM_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(107,79,231,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'jawa barat':
+                    return {
+                pane: 'pane_JOIN_DATA_INDONESIA_MUSEUM_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(145,202,47,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'jawa Tengah':
+                    return {
+                pane: 'pane_JOIN_DATA_INDONESIA_MUSEUM_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(115,171,223,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Jawa Timur ':
+                    return {
+                pane: 'pane_JOIN_DATA_INDONESIA_MUSEUM_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(217,68,234,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Kepulauan Riau':
+                    return {
+                pane: 'pane_JOIN_DATA_INDONESIA_MUSEUM_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(221,50,178,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Riau':
+                    return {
+                pane: 'pane_JOIN_DATA_INDONESIA_MUSEUM_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(225,140,101,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Sumatera Barat':
+                    return {
+                pane: 'pane_JOIN_DATA_INDONESIA_MUSEUM_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(216,86,93,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Sumatera Selatan':
+                    return {
+                pane: 'pane_JOIN_DATA_INDONESIA_MUSEUM_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(156,233,128,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'Sumatera Utara':
+                    return {
+                pane: 'pane_JOIN_DATA_INDONESIA_MUSEUM_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(122,206,129,1.0)',
+                interactive: true,
+            }
+                    break;
+                case 'NULL':
+                    return {
+                pane: 'pane_JOIN_DATA_INDONESIA_MUSEUM_4',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(231,59,128,1.0)',
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_JOIN_DATA_INDONESIA_MUSEUM_4');
+        map.getPane('pane_JOIN_DATA_INDONESIA_MUSEUM_4').style.zIndex = 404;
+        map.getPane('pane_JOIN_DATA_INDONESIA_MUSEUM_4').style['mix-blend-mode'] = 'normal';
+        var layer_JOIN_DATA_INDONESIA_MUSEUM_4 = new L.geoJson(json_JOIN_DATA_INDONESIA_MUSEUM_4, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_JOIN_DATA_INDONESIA_MUSEUM_4',
+            layerName: 'layer_JOIN_DATA_INDONESIA_MUSEUM_4',
+            pane: 'pane_JOIN_DATA_INDONESIA_MUSEUM_4',
+            onEachFeature: pop_JOIN_DATA_INDONESIA_MUSEUM_4,
+            style: style_JOIN_DATA_INDONESIA_MUSEUM_4_0,
+        });
+        bounds_group.addLayer(layer_JOIN_DATA_INDONESIA_MUSEUM_4);
+        map.addLayer(layer_JOIN_DATA_INDONESIA_MUSEUM_4);
+        function pop_IMPORTPOTO_5(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['fid'] !== null ? autolinker.link(String(feature.properties['fid']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_ID'] !== null ? autolinker.link(String(feature.properties['Museum_ID']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_kod'] !== null ? autolinker.link(String(feature.properties['Museum_kod']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td class="visible-with-data" id="Museum_NAM" colspan="2"><strong>Museum_NAM</strong><br />' + (feature.properties['Museum_NAM'] !== null ? autolinker.link(String(feature.properties['Museum_NAM']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_Pro'] !== null ? autolinker.link(String(feature.properties['Museum_Pro']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_Kab'] !== null ? autolinker.link(String(feature.properties['Museum_Kab']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_Ala'] !== null ? autolinker.link(String(feature.properties['Museum_Ala']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_LAT'] !== null ? autolinker.link(String(feature.properties['Museum_LAT']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_LON'] !== null ? autolinker.link(String(feature.properties['Museum_LON']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_Jen'] !== null ? autolinker.link(String(feature.properties['Museum_Jen']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_Tip'] !== null ? autolinker.link(String(feature.properties['Museum_Tip']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_Pen'] !== null ? autolinker.link(String(feature.properties['Museum_Pen']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td class="visible-with-data" id="Museum_Fot" colspan="2"><strong>Museum_Fot</strong><br />' + (feature.properties['Museum_Fot'] !== null ? '<img src="images/' + String(feature.properties['Museum_Fot']).replace(/[\\/:]/g, '_').trim().replace(/'/g, '\'').replace(/"/g, '&quot;') + '">' : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_P_1'] !== null ? autolinker.link(String(feature.properties['Museum_P_1']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_Kar'] !== null ? autolinker.link(String(feature.properties['Museum_Kar']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_IMPORTPOTO_5_0() {
+            return {
+                pane: 'pane_IMPORTPOTO_5',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(133,182,111,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_IMPORTPOTO_5');
+        map.getPane('pane_IMPORTPOTO_5').style.zIndex = 405;
+        map.getPane('pane_IMPORTPOTO_5').style['mix-blend-mode'] = 'normal';
+        var layer_IMPORTPOTO_5 = new L.geoJson(json_IMPORTPOTO_5, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_IMPORTPOTO_5',
+            layerName: 'layer_IMPORTPOTO_5',
+            pane: 'pane_IMPORTPOTO_5',
+            onEachFeature: pop_IMPORTPOTO_5,
+            style: style_IMPORTPOTO_5_0,
+        });
+        bounds_group.addLayer(layer_IMPORTPOTO_5);
+        map.addLayer(layer_IMPORTPOTO_5);
+        function pop_DIAGRAM_MUSEUM_INDONESIA_6(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['fid'] !== null ? autolinker.link(String(feature.properties['fid']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_ID'] !== null ? autolinker.link(String(feature.properties['Museum_ID']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_kod'] !== null ? autolinker.link(String(feature.properties['Museum_kod']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td class="visible-with-data" id="Museum_NAM" colspan="2"><strong>Museum_NAM</strong><br />' + (feature.properties['Museum_NAM'] !== null ? autolinker.link(String(feature.properties['Museum_NAM']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_Pro'] !== null ? autolinker.link(String(feature.properties['Museum_Pro']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_Kab'] !== null ? autolinker.link(String(feature.properties['Museum_Kab']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_Ala'] !== null ? autolinker.link(String(feature.properties['Museum_Ala']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_LAT'] !== null ? autolinker.link(String(feature.properties['Museum_LAT']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_LON'] !== null ? autolinker.link(String(feature.properties['Museum_LON']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_Jen'] !== null ? autolinker.link(String(feature.properties['Museum_Jen']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_Tip'] !== null ? autolinker.link(String(feature.properties['Museum_Tip']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_Pen'] !== null ? autolinker.link(String(feature.properties['Museum_Pen']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td class="visible-with-data" id="Museum_Fot" colspan="2"><strong>Museum_Fot</strong><br />' + (feature.properties['Museum_Fot'] !== null ? autolinker.link(String(feature.properties['Museum_Fot']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_P_1'] !== null ? autolinker.link(String(feature.properties['Museum_P_1']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_Kar'] !== null ? autolinker.link(String(feature.properties['Museum_Kar']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_DIAGRAM_MUSEUM_INDONESIA_6_0(feature) {
+            if (feature.properties['Museum_P_1'] >= 1.000000 && feature.properties['Museum_P_1'] <= 300.000000 ) {
+                return {
+                pane: 'pane_DIAGRAM_MUSEUM_INDONESIA_6',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,255,255,1.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['Museum_P_1'] >= 300.000000 && feature.properties['Museum_P_1'] <= 800.000000 ) {
+                return {
+                pane: 'pane_DIAGRAM_MUSEUM_INDONESIA_6',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,204,204,1.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['Museum_P_1'] >= 800.000000 && feature.properties['Museum_P_1'] <= 2000.000000 ) {
+                return {
+                pane: 'pane_DIAGRAM_MUSEUM_INDONESIA_6',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,153,153,1.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['Museum_P_1'] >= 2000.000000 && feature.properties['Museum_P_1'] <= 15000.000000 ) {
+                return {
+                pane: 'pane_DIAGRAM_MUSEUM_INDONESIA_6',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,102,102,1.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['Museum_P_1'] >= 15000.000000 && feature.properties['Museum_P_1'] <= 300000.000000 ) {
+                return {
+                pane: 'pane_DIAGRAM_MUSEUM_INDONESIA_6',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,51,51,1.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['Museum_P_1'] >= 300000.000000 && feature.properties['Museum_P_1'] <= 650000.000000 ) {
+                return {
+                pane: 'pane_DIAGRAM_MUSEUM_INDONESIA_6',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,0,0,1.0)',
+                interactive: true,
+            }
+            }
+        }
+        map.createPane('pane_DIAGRAM_MUSEUM_INDONESIA_6');
+        map.getPane('pane_DIAGRAM_MUSEUM_INDONESIA_6').style.zIndex = 406;
+        map.getPane('pane_DIAGRAM_MUSEUM_INDONESIA_6').style['mix-blend-mode'] = 'normal';
+        var layer_DIAGRAM_MUSEUM_INDONESIA_6 = new L.geoJson(json_DIAGRAM_MUSEUM_INDONESIA_6, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_DIAGRAM_MUSEUM_INDONESIA_6',
+            layerName: 'layer_DIAGRAM_MUSEUM_INDONESIA_6',
+            pane: 'pane_DIAGRAM_MUSEUM_INDONESIA_6',
+            onEachFeature: pop_DIAGRAM_MUSEUM_INDONESIA_6,
+            style: style_DIAGRAM_MUSEUM_INDONESIA_6_0,
+        });
+        bounds_group.addLayer(layer_DIAGRAM_MUSEUM_INDONESIA_6);
+        map.addLayer(layer_DIAGRAM_MUSEUM_INDONESIA_6);
+        function pop_TITIK_KOOORDINAT_7(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td class="visible-with-data" id="fid" colspan="2"><strong>fid</strong><br />' + (feature.properties['fid'] !== null ? autolinker.link(String(feature.properties['fid']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ID'] !== null ? autolinker.link(String(feature.properties['ID']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['kode'] !== null ? autolinker.link(String(feature.properties['kode']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td class="visible-with-data" id="NAMA ITEM DATA" colspan="2"><strong>NAMA ITEM DATA</strong><br />' + (feature.properties['NAMA ITEM DATA'] !== null ? autolinker.link(String(feature.properties['NAMA ITEM DATA']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Provinsi'] !== null ? autolinker.link(String(feature.properties['Provinsi']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Kabupaten'] !== null ? autolinker.link(String(feature.properties['Kabupaten']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Alamat'] !== null ? autolinker.link(String(feature.properties['Alamat']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['LATITUDE'] !== null ? autolinker.link(String(feature.properties['LATITUDE']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['LONGITUDE'] !== null ? autolinker.link(String(feature.properties['LONGITUDE']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Jenis Museum'] !== null ? autolinker.link(String(feature.properties['Jenis Museum']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Tipe Museum'] !== null ? autolinker.link(String(feature.properties['Tipe Museum']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Pengelola'] !== null ? autolinker.link(String(feature.properties['Pengelola']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td class="visible-with-data" id="Foto" colspan="2"><strong>Foto</strong><br />' + (feature.properties['Foto'] !== null ? autolinker.link(String(feature.properties['Foto']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Pengunjung'] !== null ? autolinker.link(String(feature.properties['Pengunjung']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Karyawan'] !== null ? autolinker.link(String(feature.properties['Karyawan']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_TITIK_KOOORDINAT_7_0() {
+            return {
+                pane: 'pane_TITIK_KOOORDINAT_7',
+        rotationAngle: 0.0,
+        rotationOrigin: 'center center',
+        icon: L.icon({
+            iconUrl: 'markers/TITIK_KOOORDINAT_7.svg',
+            iconSize: [18.24, 18.24]
+        }),
+                interactive: true,
+            }
+        }
+        map.createPane('pane_TITIK_KOOORDINAT_7');
+        map.getPane('pane_TITIK_KOOORDINAT_7').style.zIndex = 407;
+        map.getPane('pane_TITIK_KOOORDINAT_7').style['mix-blend-mode'] = 'normal';
+        var layer_TITIK_KOOORDINAT_7 = new L.geoJson(json_TITIK_KOOORDINAT_7, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_TITIK_KOOORDINAT_7',
+            layerName: 'layer_TITIK_KOOORDINAT_7',
+            pane: 'pane_TITIK_KOOORDINAT_7',
+            onEachFeature: pop_TITIK_KOOORDINAT_7,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.marker(latlng, style_TITIK_KOOORDINAT_7_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_TITIK_KOOORDINAT_7);
+        map.addLayer(layer_TITIK_KOOORDINAT_7);
+        function pop_LIGHTNESS_MUSEUM_8(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['fid'] !== null ? autolinker.link(String(feature.properties['fid']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_ID'] !== null ? autolinker.link(String(feature.properties['Museum_ID']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_kod'] !== null ? autolinker.link(String(feature.properties['Museum_kod']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td class="visible-with-data" id="Museum_NAM" colspan="2"><strong>Museum_NAM</strong><br />' + (feature.properties['Museum_NAM'] !== null ? autolinker.link(String(feature.properties['Museum_NAM']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_Pro'] !== null ? autolinker.link(String(feature.properties['Museum_Pro']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_Kab'] !== null ? autolinker.link(String(feature.properties['Museum_Kab']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_Ala'] !== null ? autolinker.link(String(feature.properties['Museum_Ala']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_LAT'] !== null ? autolinker.link(String(feature.properties['Museum_LAT']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_LON'] !== null ? autolinker.link(String(feature.properties['Museum_LON']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_Jen'] !== null ? autolinker.link(String(feature.properties['Museum_Jen']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_Tip'] !== null ? autolinker.link(String(feature.properties['Museum_Tip']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_Pen'] !== null ? autolinker.link(String(feature.properties['Museum_Pen']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>Museum_Fot</strong><br />' + (feature.properties['Museum_Fot'] !== null ? autolinker.link(String(feature.properties['Museum_Fot']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_P_1'] !== null ? autolinker.link(String(feature.properties['Museum_P_1']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_Kar'] !== null ? autolinker.link(String(feature.properties['Museum_Kar']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_LIGHTNESS_MUSEUM_8_0(feature) {
+            if (feature.properties['Museum_P_1'] >= 1.000000 && feature.properties['Museum_P_1'] <= 300.000000 ) {
+                return {
+                pane: 'pane_LIGHTNESS_MUSEUM_8',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,255,255,1.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['Museum_P_1'] >= 300.000000 && feature.properties['Museum_P_1'] <= 800.000000 ) {
+                return {
+                pane: 'pane_LIGHTNESS_MUSEUM_8',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,204,204,1.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['Museum_P_1'] >= 800.000000 && feature.properties['Museum_P_1'] <= 2000.000000 ) {
+                return {
+                pane: 'pane_LIGHTNESS_MUSEUM_8',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,153,153,1.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['Museum_P_1'] >= 2000.000000 && feature.properties['Museum_P_1'] <= 15000.000000 ) {
+                return {
+                pane: 'pane_LIGHTNESS_MUSEUM_8',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,102,102,1.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['Museum_P_1'] >= 15000.000000 && feature.properties['Museum_P_1'] <= 300000.000000 ) {
+                return {
+                pane: 'pane_LIGHTNESS_MUSEUM_8',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,51,51,1.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['Museum_P_1'] >= 300000.000000 && feature.properties['Museum_P_1'] <= 6500000.000000 ) {
+                return {
+                pane: 'pane_LIGHTNESS_MUSEUM_8',
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(255,0,0,1.0)',
+                interactive: true,
+            }
+            }
+        }
+        map.createPane('pane_LIGHTNESS_MUSEUM_8');
+        map.getPane('pane_LIGHTNESS_MUSEUM_8').style.zIndex = 408;
+        map.getPane('pane_LIGHTNESS_MUSEUM_8').style['mix-blend-mode'] = 'normal';
+        var layer_LIGHTNESS_MUSEUM_8 = new L.geoJson(json_LIGHTNESS_MUSEUM_8, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_LIGHTNESS_MUSEUM_8',
+            layerName: 'layer_LIGHTNESS_MUSEUM_8',
+            pane: 'pane_LIGHTNESS_MUSEUM_8',
+            onEachFeature: pop_LIGHTNESS_MUSEUM_8,
+            style: style_LIGHTNESS_MUSEUM_8_0,
+        });
+        bounds_group.addLayer(layer_LIGHTNESS_MUSEUM_8);
+        map.addLayer(layer_LIGHTNESS_MUSEUM_8);
+        function pop_centroid_9(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['fid'] !== null ? autolinker.link(String(feature.properties['fid']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_ID'] !== null ? autolinker.link(String(feature.properties['Museum_ID']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_kode'] !== null ? autolinker.link(String(feature.properties['Museum_kode']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td class="visible-with-data" id="Museum_NAMA ITEM DATA" colspan="2"><strong>Museum_NAMA ITEM DATA</strong><br />' + (feature.properties['Museum_NAMA ITEM DATA'] !== null ? autolinker.link(String(feature.properties['Museum_NAMA ITEM DATA']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_Provinsi'] !== null ? autolinker.link(String(feature.properties['Museum_Provinsi']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_Kabupaten'] !== null ? autolinker.link(String(feature.properties['Museum_Kabupaten']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_Alamat'] !== null ? autolinker.link(String(feature.properties['Museum_Alamat']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_LATITUDE'] !== null ? autolinker.link(String(feature.properties['Museum_LATITUDE']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_LONGITUDE'] !== null ? autolinker.link(String(feature.properties['Museum_LONGITUDE']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_Jenis Museum'] !== null ? autolinker.link(String(feature.properties['Museum_Jenis Museum']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_Tipe Museum'] !== null ? autolinker.link(String(feature.properties['Museum_Tipe Museum']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_Pengelola'] !== null ? autolinker.link(String(feature.properties['Museum_Pengelola']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>Museum_Foto</strong><br />' + (feature.properties['Museum_Foto'] !== null ? autolinker.link(String(feature.properties['Museum_Foto']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_Pengunjung'] !== null ? autolinker.link(String(feature.properties['Museum_Pengunjung']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_Karyawan'] !== null ? autolinker.link(String(feature.properties['Museum_Karyawan']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_centroid_9_0(feature) {
+            if (feature.properties['Museum_Pengunjung'] >= 1.000000 && feature.properties['Museum_Pengunjung'] <= 300.000000 ) {
+                return {
+                pane: 'pane_centroid_9',
+                radius: 2.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(41,228,37,1.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['Museum_Pengunjung'] >= 300.000000 && feature.properties['Museum_Pengunjung'] <= 800.000000 ) {
+                return {
+                pane: 'pane_centroid_9',
+                radius: 4.8,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(41,228,37,1.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['Museum_Pengunjung'] >= 800.000000 && feature.properties['Museum_Pengunjung'] <= 20000.000000 ) {
+                return {
+                pane: 'pane_centroid_9',
+                radius: 7.6,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(41,228,37,1.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['Museum_Pengunjung'] >= 20000.000000 && feature.properties['Museum_Pengunjung'] <= 15000.000000 ) {
+                return {
+                pane: 'pane_centroid_9',
+                radius: 10.4,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(41,228,37,1.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['Museum_Pengunjung'] >= 15000.000000 && feature.properties['Museum_Pengunjung'] <= 300000.000000 ) {
+                return {
+                pane: 'pane_centroid_9',
+                radius: 13.2,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(41,228,37,1.0)',
+                interactive: true,
+            }
+            }
+            if (feature.properties['Museum_Pengunjung'] >= 300000.000000 && feature.properties['Museum_Pengunjung'] <= 650000.000000 ) {
+                return {
+                pane: 'pane_centroid_9',
+                radius: 16.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(41,228,37,1.0)',
+                interactive: true,
+            }
+            }
+        }
+        map.createPane('pane_centroid_9');
+        map.getPane('pane_centroid_9').style.zIndex = 409;
+        map.getPane('pane_centroid_9').style['mix-blend-mode'] = 'normal';
+        var layer_centroid_9 = new L.geoJson(json_centroid_9, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_centroid_9',
+            layerName: 'layer_centroid_9',
+            pane: 'pane_centroid_9',
+            onEachFeature: pop_centroid_9,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.circleMarker(latlng, style_centroid_9_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_centroid_9);
+        map.addLayer(layer_centroid_9);
+        function pop_fotokordinat_10(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['fid'] !== null ? autolinker.link(String(feature.properties['fid']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_ID'] !== null ? autolinker.link(String(feature.properties['Museum_ID']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_kod'] !== null ? autolinker.link(String(feature.properties['Museum_kod']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td class="visible-with-data" id="Museum_NAM" colspan="2"><strong>Museum_NAM</strong><br />' + (feature.properties['Museum_NAM'] !== null ? autolinker.link(String(feature.properties['Museum_NAM']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_Pro'] !== null ? autolinker.link(String(feature.properties['Museum_Pro']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_Kab'] !== null ? autolinker.link(String(feature.properties['Museum_Kab']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_Ala'] !== null ? autolinker.link(String(feature.properties['Museum_Ala']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_LAT'] !== null ? autolinker.link(String(feature.properties['Museum_LAT']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_LON'] !== null ? autolinker.link(String(feature.properties['Museum_LON']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_Jen'] !== null ? autolinker.link(String(feature.properties['Museum_Jen']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_Tip'] !== null ? autolinker.link(String(feature.properties['Museum_Tip']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_Pen'] !== null ? autolinker.link(String(feature.properties['Museum_Pen']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2"><strong>Museum_Fot</strong><br />' + (feature.properties['Museum_Fot'] !== null ? '<img src="images/' + String(feature.properties['Museum_Fot']).replace(/[\\/:]/g, '_').trim().replace(/'/g, '\'').replace(/"/g, '&quot;') + '">' : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_P_1'] !== null ? autolinker.link(String(feature.properties['Museum_P_1']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['Museum_Kar'] !== null ? autolinker.link(String(feature.properties['Museum_Kar']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_fotokordinat_10_0() {
+            return {
+                pane: 'pane_fotokordinat_10',
+        rotationAngle: 0.0,
+        rotationOrigin: 'center center',
+        icon: L.icon({
+            iconUrl: 'markers/fotokordinat_10.svg',
+            iconSize: [22.800000000000008, 22.800000000000008]
+        }),
+                interactive: true,
+            }
+        }
+        map.createPane('pane_fotokordinat_10');
+        map.getPane('pane_fotokordinat_10').style.zIndex = 410;
+        map.getPane('pane_fotokordinat_10').style['mix-blend-mode'] = 'normal';
+        var layer_fotokordinat_10 = new L.geoJson(json_fotokordinat_10, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_fotokordinat_10',
+            layerName: 'layer_fotokordinat_10',
+            pane: 'pane_fotokordinat_10',
+            onEachFeature: pop_fotokordinat_10,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.marker(latlng, style_fotokordinat_10_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_fotokordinat_10);
+        map.addLayer(layer_fotokordinat_10);
+        var osmGeocoder = new L.Control.Geocoder({
+            collapsed: true,
+            position: 'topleft',
+            text: 'Search',
+            title: 'Testing'
+        }).addTo(map);
+        document.getElementsByClassName('leaflet-control-geocoder-icon')[0]
+        .className += ' fa fa-search';
+        document.getElementsByClassName('leaflet-control-geocoder-icon')[0]
+        .title += 'Search for a place';
+        var overlaysTree = [
+            {label: '<img src="legend/fotokordinat_10.png" /> foto kordinat', layer: layer_fotokordinat_10},
+            {label: 'centroid<br /><table><tr><td style="text-align: center;"><img src="legend/centroid_9_13000.png" /></td><td>1 - 300</td></tr><tr><td style="text-align: center;"><img src="legend/centroid_9_3008001.png" /></td><td>300 - 800</td></tr><tr><td style="text-align: center;"><img src="legend/centroid_9_800200002.png" /></td><td>800 - 20000</td></tr><tr><td style="text-align: center;"><img src="legend/centroid_9_20000150003.png" /></td><td>20000 - 15000</td></tr><tr><td style="text-align: center;"><img src="legend/centroid_9_150003000004.png" /></td><td>15000 - 300000</td></tr><tr><td style="text-align: center;"><img src="legend/centroid_9_3000006500005.png" /></td><td>300000 - 650000</td></tr></table>', layer: layer_centroid_9},
+            {label: 'LIGHTNESS_MUSEUM<br /><table><tr><td style="text-align: center;"><img src="legend/LIGHTNESS_MUSEUM_8_13000.png" /></td><td>1 - 300</td></tr><tr><td style="text-align: center;"><img src="legend/LIGHTNESS_MUSEUM_8_3008001.png" /></td><td>300 - 800</td></tr><tr><td style="text-align: center;"><img src="legend/LIGHTNESS_MUSEUM_8_80020002.png" /></td><td>800 - 2000</td></tr><tr><td style="text-align: center;"><img src="legend/LIGHTNESS_MUSEUM_8_2000150003.png" /></td><td>2000 - 15000</td></tr><tr><td style="text-align: center;"><img src="legend/LIGHTNESS_MUSEUM_8_150003000004.png" /></td><td>15000 - 300000</td></tr><tr><td style="text-align: center;"><img src="legend/LIGHTNESS_MUSEUM_8_30000065000005.png" /></td><td>300000 - 6500000</td></tr></table>', layer: layer_LIGHTNESS_MUSEUM_8},
+            {label: '<img src="legend/TITIK_KOOORDINAT_7.png" /> TITIK_KOOORDINAT', layer: layer_TITIK_KOOORDINAT_7},
+            {label: 'DIAGRAM_MUSEUM_INDONESIA<br /><table><tr><td style="text-align: center;"><img src="legend/DIAGRAM_MUSEUM_INDONESIA_6_13000.png" /></td><td>1 - 300</td></tr><tr><td style="text-align: center;"><img src="legend/DIAGRAM_MUSEUM_INDONESIA_6_3008001.png" /></td><td>300 - 800</td></tr><tr><td style="text-align: center;"><img src="legend/DIAGRAM_MUSEUM_INDONESIA_6_80020002.png" /></td><td>800 - 2000</td></tr><tr><td style="text-align: center;"><img src="legend/DIAGRAM_MUSEUM_INDONESIA_6_2000150003.png" /></td><td>2000 - 15000</td></tr><tr><td style="text-align: center;"><img src="legend/DIAGRAM_MUSEUM_INDONESIA_6_150003000004.png" /></td><td>15000 - 300000</td></tr><tr><td style="text-align: center;"><img src="legend/DIAGRAM_MUSEUM_INDONESIA_6_3000006500005.png" /></td><td>300000 - 650000</td></tr></table>', layer: layer_DIAGRAM_MUSEUM_INDONESIA_6},
+            {label: '<img src="legend/IMPORTPOTO_5.png" /> IMPORT POTO', layer: layer_IMPORTPOTO_5},
+            {label: 'JOIN_DATA_INDONESIA_MUSEUM<br /><table><tr><td style="text-align: center;"><img src="legend/JOIN_DATA_INDONESIA_MUSEUM_4_0.png" /></td><td></td></tr><tr><td style="text-align: center;"><img src="legend/JOIN_DATA_INDONESIA_MUSEUM_4_Jakarta1.png" /></td><td> Jakarta</td></tr><tr><td style="text-align: center;"><img src="legend/JOIN_DATA_INDONESIA_MUSEUM_4_Aceh2.png" /></td><td>Aceh</td></tr><tr><td style="text-align: center;"><img src="legend/JOIN_DATA_INDONESIA_MUSEUM_4_Banten3.png" /></td><td>Banten</td></tr><tr><td style="text-align: center;"><img src="legend/JOIN_DATA_INDONESIA_MUSEUM_4_DIYogyakarta4.png" /></td><td>D.I Yogyakarta</td></tr><tr><td style="text-align: center;"><img src="legend/JOIN_DATA_INDONESIA_MUSEUM_4_jakarta5.png" /></td><td>jakarta</td></tr><tr><td style="text-align: center;"><img src="legend/JOIN_DATA_INDONESIA_MUSEUM_4_Jakarta6.png" /></td><td>Jakarta</td></tr><tr><td style="text-align: center;"><img src="legend/JOIN_DATA_INDONESIA_MUSEUM_4_Jambi7.png" /></td><td>Jambi</td></tr><tr><td style="text-align: center;"><img src="legend/JOIN_DATA_INDONESIA_MUSEUM_4_jawabarat8.png" /></td><td>jawa barat</td></tr><tr><td style="text-align: center;"><img src="legend/JOIN_DATA_INDONESIA_MUSEUM_4_jawaTengah9.png" /></td><td>jawa Tengah</td></tr><tr><td style="text-align: center;"><img src="legend/JOIN_DATA_INDONESIA_MUSEUM_4_JawaTimur10.png" /></td><td>Jawa Timur </td></tr><tr><td style="text-align: center;"><img src="legend/JOIN_DATA_INDONESIA_MUSEUM_4_KepulauanRiau11.png" /></td><td>Kepulauan Riau</td></tr><tr><td style="text-align: center;"><img src="legend/JOIN_DATA_INDONESIA_MUSEUM_4_Riau12.png" /></td><td>Riau</td></tr><tr><td style="text-align: center;"><img src="legend/JOIN_DATA_INDONESIA_MUSEUM_4_SumateraBarat13.png" /></td><td>Sumatera Barat</td></tr><tr><td style="text-align: center;"><img src="legend/JOIN_DATA_INDONESIA_MUSEUM_4_SumateraSelatan14.png" /></td><td>Sumatera Selatan</td></tr><tr><td style="text-align: center;"><img src="legend/JOIN_DATA_INDONESIA_MUSEUM_4_SumateraUtara15.png" /></td><td>Sumatera Utara</td></tr><tr><td style="text-align: center;"><img src="legend/JOIN_DATA_INDONESIA_MUSEUM_4_16.png" /></td><td></td></tr></table>', layer: layer_JOIN_DATA_INDONESIA_MUSEUM_4},
+            {label: '<img src="legend/DISSOLVE_INDONESIA_3.png" /> DISSOLVE_INDONESIA', layer: layer_DISSOLVE_INDONESIA_3},
+            {label: '<img src="legend/FILTER_INDONESIA_2.png" /> FILTER_INDONESIA', layer: layer_FILTER_INDONESIA_2},
+            {label: '<img src="legend/INDONESIA_KAB_1.png" /> INDONESIA_KAB', layer: layer_INDONESIA_KAB_1},
+            {label: "OSM Standard", layer: layer_OSMStandard_0},]
+        var lay = L.control.layers.tree(null, overlaysTree,{
+            //namedToggle: true,
+            //selectorBack: false,
+            //closedSymbol: '&#8862; &#x1f5c0;',
+            //openedSymbol: '&#8863; &#x1f5c1;',
+            //collapseAll: 'Collapse all',
+            //expandAll: 'Expand all',
+            collapsed: true,
+        });
+        lay.addTo(map);
+        setBounds();
+        var i = 0;
+        layer_JOIN_DATA_INDONESIA_MUSEUM_4.eachLayer(function(layer) {
+            var context = {
+                feature: layer.feature,
+                variables: {}
+            };
+            layer.bindTooltip((layer.feature.properties['Museum_Provinsi'] !== null?String('<div style="color: #323232; font-size: 10pt; font-family: \'Open Sans\', sans-serif;">' + layer.feature.properties['Museum_Provinsi']) + '</div>':''), {permanent: true, offset: [-0, -16], className: 'css_JOIN_DATA_INDONESIA_MUSEUM_4'});
+            labels.push(layer);
+            totalMarkers += 1;
+              layer.added = true;
+              addLabel(layer, i);
+              i++;
+        });
+        var i = 0;
+        layer_TITIK_KOOORDINAT_7.eachLayer(function(layer) {
+            var context = {
+                feature: layer.feature,
+                variables: {}
+            };
+            layer.bindTooltip((layer.feature.properties['NAMA ITEM DATA'] !== null?String('<div style="color: #323232; font-size: 10pt; font-family: \'Open Sans\', sans-serif;">' + layer.feature.properties['NAMA ITEM DATA']) + '</div>':''), {permanent: true, offset: [-0, -16], className: 'css_TITIK_KOOORDINAT_7'});
+            labels.push(layer);
+            totalMarkers += 1;
+              layer.added = true;
+              addLabel(layer, i);
+              i++;
+        });
+        resetLabels([layer_JOIN_DATA_INDONESIA_MUSEUM_4,layer_TITIK_KOOORDINAT_7,layer_LIGHTNESS_MUSEUM_8]);
+        map.on("zoomend", function(){
+            resetLabels([layer_JOIN_DATA_INDONESIA_MUSEUM_4,layer_TITIK_KOOORDINAT_7,layer_LIGHTNESS_MUSEUM_8]);
+        });
+        map.on("layeradd", function(){
+            resetLabels([layer_JOIN_DATA_INDONESIA_MUSEUM_4,layer_TITIK_KOOORDINAT_7,layer_LIGHTNESS_MUSEUM_8]);
+        });
+        map.on("layerremove", function(){
+            resetLabels([layer_JOIN_DATA_INDONESIA_MUSEUM_4,layer_TITIK_KOOORDINAT_7,layer_LIGHTNESS_MUSEUM_8]);
+        });
+        </script>
+    </body>
+</html>
